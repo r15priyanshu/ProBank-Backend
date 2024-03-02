@@ -1,0 +1,29 @@
+THINGS YOU WILL LEARN/FIND
+=====================================================
+
+1. H2 DB
+2. Swagger Documentation
+3. Spring Data JPA Audit Mechanism
+4. Spotify Docker Maven Plugin
+5. Dockerizing the application
+6. Externalizing Properties
+
+ACCOUNTS SERVICE SWAGGER
+http://localhost:9091/ams/swagger-ui.html
+
+LOANS SERVICE SWAGGER
+http://localhost:9092/lms/swagger-ui.html
+
+CARDS SERVICE SWAGGER
+http://localhost:9093/ams/swagger-ui.html
+
+#CREATE IMAGE AND CONTAINERS USING DOCKER COMMANDS [ WITH - H2 DB ]
+>> docker network create probank-network
+>> docker build -t r15priyanshu/probank-accounts-service:latest .
+>> docker run --name probank-accounts-service-instance -d -p 9091:9091 --network probank-network r15priyanshu/probank-accounts-service:latest
+
+#DOCKER COMPOSE COMMANDS
+>> docker compose up -d
+>> docker compose down
+>> docker compose start -d
+>> docker compose stop
