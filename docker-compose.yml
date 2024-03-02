@@ -1,5 +1,49 @@
-#Defining All Services
+#Defining Custom Network
+networks:
+  probank-network:
+    name: probank-network
+    driver: bridge
+
+#Defining Custom Volumes    
+volumes:
+  probank-database-data:
+    name: probank-database-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:\DockerVolumes\probank\mysql-data\
+      
+  probank-backend-data:
+    name: probank-backend-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:\DockerVolumes\probank\backend-data\
+
+############################### Defining All Services ###############################
 services:
+  probank-database:
+    image: mysql:8.0.36
+    container_name: probank-mysql-instance
+    networks:
+      - probank-network
+    ports:
+      - 4406:3306
+    volumes:
+      - probank-database-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root #This sets the password of the root user
+      MYSQL_DATABASE: probank #This creates the database also when first time instance is created
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s #perform retries in the interval of mentioned time
+      timeout: 15s #wait only for mentioned time for the response
+      retries: 3 #perform mentioned times retry in case of failure
+      start_period: 10s #start health check after mentioned time
+
+
   probank-configserver:  #name that can be reffered inside this file
     build: probank-configserver/ #Will try to find Dockerfile in this location
     image: r15priyanshu/probank-configserver:latest
@@ -10,7 +54,7 @@ services:
     ports:
       - 8888:8888
     environment:
-      SPRING_PROFILES_ACTIVE: default
+      SPRING_PROFILES_ACTIVE: prd
       SPRING_APPLICATION_NAME: CONFIG-SERVER
     healthcheck:
       test: "curl --fail --silent localhost:8888/actuator/health/readiness | grep UP || exit 1"
@@ -33,8 +77,13 @@ services:
       SPRING_PROFILES_ACTIVE: prd
       SPRING_APPLICATION_NAME: ACCOUNTS-SERVICE
       SPRING_CONFIG_IMPORT: configserver:http://probank-configserver:8888/
+      SPRING_DATASOURCE_URL: jdbc:mysql://probank-database:3306/probank
+    depends_on:  
       probank-configserver:
         condition: service_healthy
+      probank-database:
+        condition: service_healthy
+      
     
 
   probank-loans-service:
@@ -50,11 +99,14 @@ services:
       SPRING_PROFILES_ACTIVE: prd
       SPRING_APPLICATION_NAME: LOANS-SERVICE
       SPRING_CONFIG_IMPORT: configserver:http://probank-configserver:8888/
+      SPRING_DATASOURCE_URL: jdbc:mysql://probank-database:3306/probank
     depends_on:
       probank-configserver:
         condition: service_healthy
-   
-      
+      probank-database:
+        condition: service_healthy
+
+
   probank-cards-service:
     build: probank-cards-service/
     image: r15priyanshu/probank-cards-service:latest
@@ -68,13 +120,9 @@ services:
       SPRING_PROFILES_ACTIVE: prd
       SPRING_APPLICATION_NAME: CARDS-SERVICE
       SPRING_CONFIG_IMPORT: configserver:http://probank-configserver:8888/
+      SPRING_DATASOURCE_URL: jdbc:mysql://probank-database:3306/probank
     depends_on:
       probank-configserver:
         condition: service_healthy
-
-
-#Defining Custom Network
-networks:
-  probank-network:
-    name: probank-network
-    driver: bridge
+      probank-database:
+        condition: service_healthy

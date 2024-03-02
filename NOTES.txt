@@ -1,7 +1,27 @@
 THINGS YOU WILL LEARN/FIND
-=====================================================
+==========================
 
+--------------------------------------------------------------
 1. H2 DB
+
+<dependency>
+	<groupId>com.h2database</groupId>
+	<artifactId>h2</artifactId>
+	<scope>runtime</scope>
+</dependency>
+
+#H2 Related Configurations
+spring.datasource.url=jdbc:h2:mem:probank
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=root
+spring.datasource.password=root
+spring.h2.console.enabled=true
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+--------------------------------------------------------------
+--------------------------------------------------------------
 2. Swagger Documentation
 3. Spring Data JPA Audit Mechanism
 4. Spotify Docker Maven Plugin
