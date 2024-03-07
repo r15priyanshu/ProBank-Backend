@@ -53,14 +53,14 @@ public class CardController {
 				.orElseThrow(() -> new GlobalCustomException("Card not found with card Number : " + cardNumber,
 						HttpStatus.NOT_FOUND));
 		CardDto response = cardService.mapCardToCardDto(foundCard);
-		return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping("/customers/cards/{customerNumber}")
 	private ResponseEntity<List<CardDto>> getAllCardsDetailsByCustomerNumber(@PathVariable int customerNumber) {
 		List<Card> foundCards = cardService.fetchAllCardsDetailsByCustomerNumber(customerNumber);
 		List<CardDto> foundCardsDto = foundCards.stream().map(card->cardService.mapCardToCardDto(card)).collect(Collectors.toList());
-		return new ResponseEntity<>(foundCardsDto, HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(foundCardsDto, HttpStatus.OK);
 	}
 	
 	@GetMapping("/test")
