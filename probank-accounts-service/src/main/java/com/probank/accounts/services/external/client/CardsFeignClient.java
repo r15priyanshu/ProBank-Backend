@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.probank.accounts.dtos.CardDto;
+import com.probank.accounts.dtos.external.CardDto;
 
 @FeignClient(name = "CARDS-SERVICE")
 public interface CardsFeignClient {

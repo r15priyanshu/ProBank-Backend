@@ -1,5 +1,6 @@
 package com.probank.loans.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -37,6 +38,11 @@ public class LoanServiceImpl implements LoanService {
 	@Override
 	public Optional<Loan> fetchLoanDetailsByLoanNumber(int loanNumber) {
 		return loanRepository.findByLoanNumber(loanNumber);
+	}
+	
+	@Override
+	public List<Loan> fetchAllLoansDetailsByCustomerNumber(int customerNumber) {
+		return loanRepository.findByCustomerNumber(customerNumber);
 	}
 
 	@Override

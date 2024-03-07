@@ -2,6 +2,9 @@ package com.probank.accounts.dtos;
 
 import java.util.List;
 
+import com.probank.accounts.dtos.external.CardDto;
+import com.probank.accounts.dtos.external.LoanDto;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -25,4 +28,6 @@ public class CustomerDto {
 	private String mobileNumber;
 	
 	private List<CardDto> cards;
+	
+	private List<LoanDto> loans;
 }

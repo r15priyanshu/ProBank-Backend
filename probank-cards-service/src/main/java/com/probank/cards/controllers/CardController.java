@@ -28,13 +28,13 @@ import jakarta.validation.Valid;
 @RestController
 @Tag(name = "CARDS CONTROLLER", description = "This controller will help you to perform cards related operations..!!")
 public class CardController {
-	
+
 	@Value("${app.environment}")
 	private String appEnvironment;
 
 	@Autowired
 	private CardService cardService;
-	
+
 	@Autowired
 	private Environment environment;
 
@@ -55,17 +55,18 @@ public class CardController {
 		CardDto response = cardService.mapCardToCardDto(foundCard);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/customers/cards/{customerNumber}")
 	private ResponseEntity<List<CardDto>> getAllCardsDetailsByCustomerNumber(@PathVariable int customerNumber) {
 		List<Card> foundCards = cardService.fetchAllCardsDetailsByCustomerNumber(customerNumber);
-		List<CardDto> foundCardsDto = foundCards.stream().map(card->cardService.mapCardToCardDto(card)).collect(Collectors.toList());
+		List<CardDto> foundCardsDto = foundCards.stream().map(card -> cardService.mapCardToCardDto(card))
+				.collect(Collectors.toList());
 		return new ResponseEntity<>(foundCardsDto, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/test")
 	public ResponseEntity<HashMap<String, String>> testEndpoind() {
-		HashMap<String, String> test=new HashMap<>();
+		HashMap<String, String> test = new HashMap<>();
 		test.put("APP-ENV", appEnvironment);
 		test.put("APP-NANE", environment.getProperty("spring.application.name"));
 		test.put("APP-JAVA-HOME-PATH", environment.getProperty("JAVA_HOME"));

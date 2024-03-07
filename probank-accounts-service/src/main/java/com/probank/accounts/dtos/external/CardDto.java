@@ -1,4 +1,4 @@
-package com.probank.accounts.dtos;
+package com.probank.accounts.dtos.external;
 
 
 import lombok.Getter;

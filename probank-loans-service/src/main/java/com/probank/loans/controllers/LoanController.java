@@ -1,6 +1,8 @@
 package com.probank.loans.controllers;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,13 +28,13 @@ import jakarta.validation.Valid;
 @RestController
 @Tag(name = "LOANS CONTROLLER", description = "This controller will help you to perform loans related operations..!!")
 public class LoanController {
-	
+
 	@Value("${app.environment}")
 	private String appEnvironment;
 
 	@Autowired
 	private LoanService loanService;
-	
+
 	@Autowired
 	private Environment environment;
 
@@ -51,12 +53,20 @@ public class LoanController {
 				.orElseThrow(() -> new GlobalCustomException("Loan not found with loanNumber : " + loanNumber,
 						HttpStatus.NOT_FOUND));
 
-		return new ResponseEntity<>(foundLoan, HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(foundLoan, HttpStatus.OK);
 	}
-	
+
+	@GetMapping("/customers/loans/{customerNumber}")
+	private ResponseEntity<List<LoanDto>> getAllLoansDetailsByCustomerNumber(@PathVariable int customerNumber) {
+		List<Loan> foundLoans = loanService.fetchAllLoansDetailsByCustomerNumber(customerNumber);
+		List<LoanDto> foundLoansDto = foundLoans.stream().map(loan -> loanService.mapLoanToLoanDto(loan))
+				.collect(Collectors.toList());
+		return new ResponseEntity<>(foundLoansDto, HttpStatus.OK);
+	}
+
 	@GetMapping("/test")
 	public ResponseEntity<HashMap<String, String>> testEndpoind() {
-		HashMap<String, String> test=new HashMap<>();
+		HashMap<String, String> test = new HashMap<>();
 		test.put("APP-ENV", appEnvironment);
 		test.put("APP-NANE", environment.getProperty("spring.application.name"));
 		test.put("APP-JAVA-HOME-PATH", environment.getProperty("JAVA_HOME"));
