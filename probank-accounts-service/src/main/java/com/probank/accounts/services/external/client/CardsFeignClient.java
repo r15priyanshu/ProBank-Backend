@@ -11,6 +11,6 @@ import com.probank.accounts.dtos.external.CardDto;
 
 @FeignClient(name = "CARDS-SERVICE")
 public interface CardsFeignClient {
-	@GetMapping(value = "/cms/customers/cards/{customerNumber}", consumes = "application/json")
+	@GetMapping(value = "/cardsms/customers/cards/{customerNumber}", consumes = "application/json")
 	ResponseEntity<List<CardDto>> getAllCardsDetailsByCustomerNumber(@PathVariable int customerNumber);
 }

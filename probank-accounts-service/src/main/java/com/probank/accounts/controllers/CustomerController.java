@@ -16,7 +16,7 @@ import com.probank.accounts.entities.Customer;
 import com.probank.accounts.exceptions.GlobalCustomException;
 import com.probank.accounts.services.CustomerService;
 import com.probank.accounts.services.external.client.CardsFeignClient;
-import com.probank.accounts.services.external.client.loansFeignClient;
+import com.probank.accounts.services.external.client.LoansFeignClient;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -31,7 +31,7 @@ public class CustomerController {
 	private CardsFeignClient cardsFeignClient;
 
 	@Autowired
-	private loansFeignClient loansFeignClient;
+	private LoansFeignClient loansFeignClient;
 
 	@GetMapping("/customers/{customerNumber}")
 	private ResponseEntity<CustomerDto> fetchCustomerDetailsByCustomerNumber(@PathVariable int customerNumber) {
