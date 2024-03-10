@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.probank.accounts.dtos.external.CardDto;
 
-@FeignClient(name = "CARDS-SERVICE")
+@FeignClient(name = "PROBANK-CARDS-SERVICE")
 public interface CardsFeignClient {
-	@GetMapping(value = "/cardsms/customers/cards/{customerNumber}", consumes = "application/json")
+	@GetMapping(value = "/customers/cards/{customerNumber}", consumes = "application/json")
 	ResponseEntity<List<CardDto>> getAllCardsDetailsByCustomerNumber(@PathVariable int customerNumber);
 }
