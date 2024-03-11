@@ -104,6 +104,12 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://probank-eurekaserver:8761/eureka/
       SPRING_CONFIG_IMPORT: configserver:http://probank-configserver:8888/
       SPRING_DATASOURCE_URL: jdbc:mysql://probank-database:3306/probank
+    healthcheck:
+      test: "curl --fail --silent localhost:9091/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
     depends_on:  
       probank-configserver:
         condition: service_healthy
@@ -124,6 +130,12 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://probank-eurekaserver:8761/eureka/
       SPRING_CONFIG_IMPORT: configserver:http://probank-configserver:8888/
       SPRING_DATASOURCE_URL: jdbc:mysql://probank-database:3306/probank
+    healthcheck:
+      test: "curl --fail --silent localhost:9092/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
     depends_on:
       probank-configserver:
         condition: service_healthy
@@ -144,6 +156,34 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://probank-eurekaserver:8761/eureka/
       SPRING_CONFIG_IMPORT: configserver:http://probank-configserver:8888/
       SPRING_DATASOURCE_URL: jdbc:mysql://probank-database:3306/probank
+    healthcheck:
+      test: "curl --fail --silent localhost:9093/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
     depends_on:
       probank-configserver:
+        condition: service_healthy
+
+
+  probank-apigateway:
+    build: probank-apigateway/
+    image: r15priyanshu/probank-apigateway:latest
+    restart: always
+    container_name: probank-apigateway-instance
+    networks: 
+      - probank-network
+    ports:
+      - 9090:9090
+    environment:
+      SPRING_PROFILES_ACTIVE: prd
+      SPRING_APPLICATION_NAME: PROBANK-APIGATEWAY
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://probank-eurekaserver:8761/eureka/
+    depends_on:
+      probank-accounts-service:
+        condition: service_healthy
+      probank-loans-service:
+        condition: service_healthy
+      probank-cards-service:
         condition: service_healthy
