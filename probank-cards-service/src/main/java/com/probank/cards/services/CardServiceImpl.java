@@ -1,5 +1,6 @@
 package com.probank.cards.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -37,6 +38,11 @@ public class CardServiceImpl implements CardService {
 	public Optional<Card> fetchCardDetailsByCardNumber(String cardNumber) {
 		return cardRepository.findByCardNumber(cardNumber);
 	}
+	
+	@Override
+	public List<Card> fetchAllCardsDetailsByCustomerNumber(int customerNumber) {
+		return cardRepository.findByCustomerNumber(customerNumber);
+	}
 
 	@Override
 	public Card mapCardDtoToCard(CardDto cardDto) {
@@ -47,5 +53,4 @@ public class CardServiceImpl implements CardService {
 	public CardDto mapCardToCardDto(Card card) {
 		return modelMapper.map(card, CardDto.class);
 	}
-
 }

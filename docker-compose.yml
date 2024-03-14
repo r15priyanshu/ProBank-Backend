@@ -38,14 +38,35 @@ services:
       MYSQL_DATABASE: probank #This creates the database also when first time instance is created
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-      interval: 10s #perform retries in the interval of mentioned time
-      timeout: 15s #wait only for mentioned time for the response
+      interval: 30s #perform retries in the interval of mentioned time
+      timeout: 30s #wait only for mentioned time for the response
       retries: 3 #perform mentioned times retry in case of failure
       start_period: 10s #start health check after mentioned time
 
+  probank-eurekaserver: 
+    build: probank-eurekaserver/
+    image: r15priyanshu/probank-eurekaserver:latest
+    restart: always
+    container_name: probank-eurekaserver-instance
+    networks: 
+      - probank-network
+    ports:
+      - 8761:8761
+    environment:
+      SPRING_PROFILES_ACTIVE: prd
+      SPRING_APPLICATION_NAME: PROBANK-EUREKASERVER
+    healthcheck:
+      test: "curl --fail --silent localhost:8761/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      probank-database:
+        condition: service_healthy
 
-  probank-configserver:  #name that can be reffered inside this file
-    build: probank-configserver/ #Will try to find Dockerfile in this location
+  probank-configserver:
+    build: probank-configserver/
     image: r15priyanshu/probank-configserver:latest
     restart: always
     container_name: probank-configserver-instance
@@ -55,13 +76,17 @@ services:
       - 8888:8888
     environment:
       SPRING_PROFILES_ACTIVE: prd
-      SPRING_APPLICATION_NAME: CONFIG-SERVER
+      SPRING_APPLICATION_NAME: PROBANK-CONFIGSERVER
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://probank-eurekaserver:8761/eureka/
     healthcheck:
       test: "curl --fail --silent localhost:8888/actuator/health/readiness | grep UP || exit 1"
-      interval: 60s #perform retries in the interval of mentioned time
-      timeout: 30s #wait only for mentioned time for the response
-      retries: 2 #perform mentioned times retry in case of failure
-      start_period: 30s #start health check after mentioned time
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      probank-eurekaserver:
+        condition: service_healthy
 
 
   probank-accounts-service:
@@ -75,17 +100,21 @@ services:
       - 9091:9091
     environment:
       SPRING_PROFILES_ACTIVE: prd
-      SPRING_APPLICATION_NAME: ACCOUNTS-SERVICE
+      SPRING_APPLICATION_NAME: PROBANK-ACCOUNTS-SERVICE
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://probank-eurekaserver:8761/eureka/
       SPRING_CONFIG_IMPORT: configserver:http://probank-configserver:8888/
       SPRING_DATASOURCE_URL: jdbc:mysql://probank-database:3306/probank
+    healthcheck:
+      test: "curl --fail --silent localhost:9091/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
     depends_on:  
       probank-configserver:
         condition: service_healthy
-      probank-database:
-        condition: service_healthy
       
     
-
   probank-loans-service:
     build: probank-loans-service/ 
     image: r15priyanshu/probank-loans-service:latest
@@ -97,13 +126,18 @@ services:
       - 9092:9092
     environment:
       SPRING_PROFILES_ACTIVE: prd
-      SPRING_APPLICATION_NAME: LOANS-SERVICE
+      SPRING_APPLICATION_NAME: PROBANK-LOANS-SERVICE
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://probank-eurekaserver:8761/eureka/
       SPRING_CONFIG_IMPORT: configserver:http://probank-configserver:8888/
       SPRING_DATASOURCE_URL: jdbc:mysql://probank-database:3306/probank
+    healthcheck:
+      test: "curl --fail --silent localhost:9092/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
     depends_on:
       probank-configserver:
-        condition: service_healthy
-      probank-database:
         condition: service_healthy
 
 
@@ -118,11 +152,38 @@ services:
       - 9093:9093
     environment:
       SPRING_PROFILES_ACTIVE: prd
-      SPRING_APPLICATION_NAME: CARDS-SERVICE
+      SPRING_APPLICATION_NAME: PROBANK-CARDS-SERVICE
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://probank-eurekaserver:8761/eureka/
       SPRING_CONFIG_IMPORT: configserver:http://probank-configserver:8888/
       SPRING_DATASOURCE_URL: jdbc:mysql://probank-database:3306/probank
+    healthcheck:
+      test: "curl --fail --silent localhost:9093/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
     depends_on:
       probank-configserver:
         condition: service_healthy
-      probank-database:
+
+
+  probank-apigateway:
+    build: probank-apigateway/
+    image: r15priyanshu/probank-apigateway:latest
+    restart: always
+    container_name: probank-apigateway-instance
+    networks: 
+      - probank-network
+    ports:
+      - 9090:9090
+    environment:
+      SPRING_PROFILES_ACTIVE: prd
+      SPRING_APPLICATION_NAME: PROBANK-APIGATEWAY
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://probank-eurekaserver:8761/eureka/
+    depends_on:
+      probank-accounts-service:
+        condition: service_healthy
+      probank-loans-service:
+        condition: service_healthy
+      probank-cards-service:
         condition: service_healthy

@@ -1,5 +1,6 @@
 package com.probank.cards.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.probank.cards.dtos.CardDto;
@@ -14,4 +15,6 @@ public interface CardService {
 	Card mapCardDtoToCard(CardDto cardDto);
 
 	CardDto mapCardToCardDto(Card card);
+	
+	List<Card> fetchAllCardsDetailsByCustomerNumber(int customerNumber);
 }
