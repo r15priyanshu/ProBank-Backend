@@ -1,10 +1,10 @@
-package com.probank.probankapigateway;
+package com.probank.message;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ProbankApigatewayApplicationTests {
+class ApplicationTests {
 
 	@Test
 	void contextLoads() {

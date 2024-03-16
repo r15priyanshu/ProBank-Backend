@@ -43,6 +43,22 @@ services:
       retries: 3 #perform mentioned times retry in case of failure
       start_period: 10s #start health check after mentioned time
 
+  probank-rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: probank-rabbitmq-instance
+    hostname: rabbitmq
+    networks:
+      - probank-network
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 30s #perform retries in the interval of mentioned time
+      timeout: 30s #wait only for mentioned time for the response
+      retries: 3 #perform mentioned times retry in case of failure
+      start_period: 10s #start health check after mentioned time
+
   probank-eurekaserver: 
     build: probank-eurekaserver/
     image: r15priyanshu/probank-eurekaserver:latest
@@ -104,6 +120,7 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://probank-eurekaserver:8761/eureka/
       SPRING_CONFIG_IMPORT: configserver:http://probank-configserver:8888/
       SPRING_DATASOURCE_URL: jdbc:mysql://probank-database:3306/probank
+      SPRING_RABBITMQ_HOST: probank-rabbitmq
     healthcheck:
       test: "curl --fail --silent localhost:9091/actuator/health/readiness | grep UP || exit 1"
       interval: 30s
@@ -112,6 +129,8 @@ services:
       start_period: 10s
     depends_on:  
       probank-configserver:
+        condition: service_healthy
+      probank-rabbitmq:
         condition: service_healthy
       
     
@@ -166,6 +185,28 @@ services:
       probank-configserver:
         condition: service_healthy
 
+  probank-message-service:
+    build: probank-message-service/
+    image: r15priyanshu/probank-message-service:latest
+    restart: always
+    container_name: probank-message-service-instance
+    networks: 
+      - probank-network
+    ports:
+      - 9094:9094
+    environment:
+      SPRING_PROFILES_ACTIVE: prd
+      SPRING_APPLICATION_NAME: PROBANK-MESSAGE-SERVICE
+      SPRING_RABBITMQ_HOST: probank-rabbitmq
+    healthcheck:
+      test: "curl --fail --silent localhost:9094/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      probank-rabbitmq:
+        condition: service_healthy
 
   probank-apigateway:
     build: probank-apigateway/

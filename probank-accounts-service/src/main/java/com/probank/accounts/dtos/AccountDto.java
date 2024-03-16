@@ -17,6 +17,8 @@ public class AccountDto {
 
 	@NotEmpty(message = "Account Type cannot be empty !!")
 	private String accountType;
+	private boolean isEmailNotificationSent;
+	private boolean isSmsNotificationSent;
 
 	private CustomerDto customer;
 }

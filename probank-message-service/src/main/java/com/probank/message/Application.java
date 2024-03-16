@@ -1,13 +1,13 @@
-package com.probank.probankapigateway;
+package com.probank.message;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ProbankApigatewayApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ProbankApigatewayApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }

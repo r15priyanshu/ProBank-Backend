@@ -4,11 +4,13 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.probank.accounts.constants.GlobalConstants;
 import com.probank.accounts.dtos.AccountDto;
+import com.probank.accounts.dtos.AccountMessageDto;
 import com.probank.accounts.dtos.CustomerDto;
 import com.probank.accounts.entities.Account;
 import com.probank.accounts.entities.Customer;
@@ -29,6 +31,9 @@ public class AccountServiceImpl implements AccountService {
 	private AccountRepository accountRepository;
 
 	@Autowired
+	private StreamBridge streamBridge;
+
+	@Autowired
 	private ModelMapper modelMapper;
 
 	@Override
@@ -44,20 +49,36 @@ public class AccountServiceImpl implements AccountService {
 			throw new GlobalCustomException("Mobile is already Registered !! Kindly provide different mobile number !!",
 					HttpStatus.BAD_REQUEST);
 		}
-		
-		//WE WILL MANUALLY CREATE NEW CUSTOMER OBJ
-		Customer newCustomer=new  Customer();
+
+		// WE WILL MANUALLY CREATE NEW CUSTOMER OBJ
+		Customer newCustomer = new Customer();
 		newCustomer.setCustomerNumber((int) GlobalUtils.randomNDigitNumber(GlobalConstants.CUSTOMER_NUMBER_LENGTH));
 		newCustomer.setName(customerDto.getName());
 		newCustomer.setEmail(customerDto.getEmail());
 		newCustomer.setMobileNumber(customerDto.getMobileNumber());
-		
-		//WE WILL MANUALLY CREATE NEW ACCOUNT OBJ
+
+		// WE WILL MANUALLY CREATE NEW ACCOUNT OBJ
 		Account newAccount = new Account();
 		newAccount.setAccountNumber((int) GlobalUtils.randomNDigitNumber(GlobalConstants.ACCOUNT_NUMBER_LENGTH));
 		newAccount.setAccountType(accountType);
 		newAccount.setCustomer(newCustomer);
-		return accountRepository.save(newAccount);
+		newAccount = accountRepository.save(newAccount);
+
+		// TRIGGER NOTIFICATIONS ALSO ONCE ACCOUNT IS CREATED
+		triggerEmailAndSmsNotification(newAccount);
+		return newAccount;
+	}
+
+	private void triggerEmailAndSmsNotification(Account account) {
+		AccountMessageDto accountMessageDto = new AccountMessageDto();
+		accountMessageDto.setAccountNumber(account.getAccountNumber());
+		accountMessageDto.setEmail(account.getCustomer().getEmail());
+		accountMessageDto.setName(account.getCustomer().getName());
+		accountMessageDto.setMobileNumber(account.getCustomer().getMobileNumber());
+		boolean requestStatus = streamBridge.send("email-exchange-request", accountMessageDto);
+		log.info("Sent Email Request With Details : {} and Status: {}", accountMessageDto,requestStatus);
+		requestStatus=streamBridge.send("sms-exchange-request", accountMessageDto);
+		log.info("Sent Sms Request With Details : {} and Status: {}", accountMessageDto,requestStatus);
 	}
 
 	public Account mapAccountDtoToAccount(AccountDto accountDto) {
@@ -68,5 +89,4 @@ public class AccountServiceImpl implements AccountService {
 		return modelMapper.map(account, AccountDto.class);
 	}
 
-	
 }

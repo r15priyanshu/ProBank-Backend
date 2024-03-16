@@ -29,6 +29,8 @@ public class Account extends BaseEntity {
 	@Column(unique = true)
 	private int accountNumber;
 	private String accountType;
+	private boolean isEmailNotificationSent;
+	private boolean isSmsNotificationSent;
 
 	@JoinColumn(name = "customer_id")
 	@OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
