@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.probank.accounts.dtos.external.LoanDto;
 
-@FeignClient(name = "PROBANK-LOANS-SERVICE")
+@FeignClient(name = "PROBANK-LOANS-SERVICE",fallback = LoansFeignFallback.class)
 public interface LoansFeignClient {
 
 	@GetMapping(value = "/customers/loans/{customerNumber}", consumes = "application/json")

@@ -1,5 +1,6 @@
 package com.probank.accounts.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -10,10 +11,7 @@ import com.probank.accounts.dtos.CustomerDto;
 import com.probank.accounts.entities.Customer;
 import com.probank.accounts.repositories.CustomerRepository;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
@@ -38,6 +36,11 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public Optional<Customer> findByCustomerNumber(int customerNumber) {
 		return customerRepository.findByCustomerNumber(customerNumber);
+	}
+
+	@Override
+	public List<Customer> getAllCustomers() {
+		return customerRepository.findAll();
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.probank.accounts.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,12 +52,24 @@ public class CustomerController {
 		// CALLING CARDS MICROSERVICE
 		ResponseEntity<List<CardDto>> cardsResponse = cardsFeignClient
 				.getAllCardsDetailsByCustomerNumber(customerNumber);
-		customerDto.setCards(cardsResponse.getBody());
+		if (cardsResponse != null) {
+			customerDto.setCards(cardsResponse.getBody());
+		}
 
 		// CALLING LOANS MICROSERVICE
 		ResponseEntity<List<LoanDto>> loansResponse = loansFeignClient
 				.getAllLoansDetailsByCustomerNumber(customerNumber);
-		customerDto.setLoans(loansResponse.getBody());
+		if (loansResponse != null) {
+			customerDto.setLoans(loansResponse.getBody());
+		}
 		return new ResponseEntity<>(customerDto, HttpStatus.OK);
+	}
+
+	@GetMapping("/customers")
+	public ResponseEntity<List<CustomerDto>> fetchAllCustomers() {
+		List<Customer> allCustomers = customerService.getAllCustomers();
+		List<CustomerDto> allCustomersDto = allCustomers.stream()
+				.map(customer -> customerService.mapCustomerToCustomerDto(customer)).collect(Collectors.toList());
+		return new ResponseEntity<>(allCustomersDto, HttpStatus.OK);
 	}
 }

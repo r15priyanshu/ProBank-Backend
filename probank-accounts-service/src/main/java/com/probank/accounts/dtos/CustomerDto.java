@@ -2,6 +2,8 @@ package com.probank.accounts.dtos;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.probank.accounts.dtos.external.CardDto;
 import com.probank.accounts.dtos.external.LoanDto;
 
@@ -27,7 +29,9 @@ public class CustomerDto {
 	@Pattern(regexp = "^[1-9]\\d{9}$",message = "Mobile number must be 10 digits with the first digit not being 0 !!")
 	private String mobileNumber;
 	
+	@JsonInclude(value = Include.NON_NULL)
 	private List<CardDto> cards;
 	
+	@JsonInclude(value = Include.NON_NULL)
 	private List<LoanDto> loans;
 }
