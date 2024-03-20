@@ -20,8 +20,10 @@ import com.probank.accounts.services.external.client.CardsFeignClient;
 import com.probank.accounts.services.external.client.LoansFeignClient;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
+@Slf4j
 @Tag(name = "CUSTOMERS CONTROLLER", description = "This controller will help you to perform customer related operations..!!")
 public class CustomerController {
 
@@ -36,6 +38,7 @@ public class CustomerController {
 
 	@GetMapping("/customers/{customerNumber}")
 	private ResponseEntity<CustomerDto> fetchCustomerDetailsByCustomerNumber(@PathVariable int customerNumber) {
+		log.info("Inside fetchCustomerDetailsByCustomerNumber for : {}",customerNumber);
 		Customer foundCustomer = customerService.findByCustomerNumber(customerNumber).orElseThrow(
 				() -> new GlobalCustomException("No Customer Found With customer Number : " + customerNumber,
 						HttpStatus.NOT_FOUND));
