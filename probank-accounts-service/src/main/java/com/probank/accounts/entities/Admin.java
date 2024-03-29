@@ -24,5 +24,6 @@ public class Admin  extends BaseEntity {
 	private int adminId;
 	private String adminFullName;
 	private String adminEmail;
+	private String adminPassword;
 	private String adminMobileNumber;
 }
