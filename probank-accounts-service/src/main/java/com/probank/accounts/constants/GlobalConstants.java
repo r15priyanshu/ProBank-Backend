@@ -11,4 +11,7 @@ public class GlobalConstants {
 	public static final int ACCOUNT_NUMBER_LENGTH = 8;
 	public static final String ACCOUNT_TYPE_SAVINGS = "SAVINGS";
 	public static final String ACCOUNT_TYPE_CURRENT = "CURRENT";
+	public static final String TEN_RUPEE_NOTE = "TEN_RUPEE_NOTE";
+	public static final String ONE_HUNDRED_RUPEE_NOTE = "ONE_HUNDRED_RUPEE_NOTE";
+	public static final String FIVE_HUNDRED_RUPEE_NOTE = "FIVE_HUNDRED_RUPEE_NOTE";
 }

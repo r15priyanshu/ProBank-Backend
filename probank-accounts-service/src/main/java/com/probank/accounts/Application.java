@@ -1,8 +1,10 @@
 package com.probank.accounts;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
@@ -10,6 +12,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 // We are telling JPA to do auditing for createdBy and modifiedBy using this bean
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class Application {
+	
+	@Bean
+	ModelMapper modelMapper() {
+		return new ModelMapper();
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
