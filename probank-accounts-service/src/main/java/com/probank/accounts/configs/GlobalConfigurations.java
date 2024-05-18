@@ -1,5 +1,8 @@
 package com.probank.accounts.configs;
 
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +16,7 @@ import com.probank.accounts.services.processors.TenRupeeMoneyProcessor;
 
 @Configuration
 public class GlobalConfigurations {
-	
+
 	@Autowired
 	private NoteService noteService;
 
@@ -21,12 +24,19 @@ public class GlobalConfigurations {
 	AuditorAware<String> auditorAware() {
 		return new AuditorAwareImpl();
 	}
-	
+
+	@Bean
+	RedissonClient redissonClient() {
+		Config config = new Config();
+		config.useSingleServer().setAddress("redis://localhost:6379");
+		return Redisson.create(config);
+	}
+
 	@Bean
 	MoneyProcessor getMoneyProcessor() {
-		FiveHundredRupeeMoneyProcessor fiveHundredRupeeMoneyProcessor=new FiveHundredRupeeMoneyProcessor();
-		OneHundredRupeeMoneyProcessor oneHundredRupeeMoneyProcessor=new OneHundredRupeeMoneyProcessor();
-		TenRupeeMoneyProcessor tenRupeeMoneyProcessor=new TenRupeeMoneyProcessor();
+		FiveHundredRupeeMoneyProcessor fiveHundredRupeeMoneyProcessor = new FiveHundredRupeeMoneyProcessor();
+		OneHundredRupeeMoneyProcessor oneHundredRupeeMoneyProcessor = new OneHundredRupeeMoneyProcessor();
+		TenRupeeMoneyProcessor tenRupeeMoneyProcessor = new TenRupeeMoneyProcessor();
 		fiveHundredRupeeMoneyProcessor.nextMoneyProcessor(oneHundredRupeeMoneyProcessor);
 		fiveHundredRupeeMoneyProcessor.setNoteService(noteService);
 		oneHundredRupeeMoneyProcessor.nextMoneyProcessor(tenRupeeMoneyProcessor);

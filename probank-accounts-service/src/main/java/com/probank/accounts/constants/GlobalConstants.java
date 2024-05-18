@@ -14,4 +14,5 @@ public class GlobalConstants {
 	public static final String TEN_RUPEE_NOTE = "TEN_RUPEE_NOTE";
 	public static final String ONE_HUNDRED_RUPEE_NOTE = "ONE_HUNDRED_RUPEE_NOTE";
 	public static final String FIVE_HUNDRED_RUPEE_NOTE = "FIVE_HUNDRED_RUPEE_NOTE";
+	public static final String NOTE_DISPENSER_LOCK_NAME = "NOTE_DISPENSER_LOCK_NAME";
 }
