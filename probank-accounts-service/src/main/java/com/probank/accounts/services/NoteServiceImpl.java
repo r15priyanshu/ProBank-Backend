@@ -47,6 +47,11 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
+	public Optional<Note> findNoteByNoteTypeOptional(String noteType) {
+		return this.noteRepository.findNoteByNoteType(noteType);
+	}
+	
+	@Override
 	public int getNoteCountByNoteType(String noteType) {
 		return this.findNoteByNoteType(noteType).getNoteCount();
 	}
