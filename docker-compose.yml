@@ -12,7 +12,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: D:\DockerVolumes\probank\mysql-data\
+      device: D:\DOCKER-VOLUMES\probank\database-data\
       
   probank-backend-data:
     name: probank-backend-data
@@ -20,7 +20,15 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: D:\DockerVolumes\probank\backend-data\
+      device: D:\DOCKER-VOLUMES\probank\backend-data\
+
+  probank-redis-data:
+    name: probank-redis-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:\DOCKER-VOLUMES\probank\redis-data\
 
 ############################### Defining All Services ###############################
 services:
@@ -59,8 +67,28 @@ services:
       retries: 3 #perform mentioned times retry in case of failure
       start_period: 10s #start health check after mentioned time
 
-  probank-eurekaserver: 
-    build: probank-eurekaserver/
+  probank-redis:
+    image: redis
+    container_name: probank-redis-instance
+    networks:
+      - probank-network
+    ports:
+      - 6379:6379
+    volumes:
+      - probank-redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  probank-eurekaserver:
+    #If you specify build, then it will try to look for Dockerfile for this service in the context provided. 
+    build: 
+      context: ./probank-eurekaserver
+      dockerfile: Dockerfile
     image: r15priyanshu/probank-eurekaserver:latest
     restart: always
     container_name: probank-eurekaserver-instance
@@ -82,7 +110,9 @@ services:
         condition: service_healthy
 
   probank-configserver:
-    build: probank-configserver/
+    build: 
+      context: ./probank-configserver
+      dockerfile: Dockerfile
     image: r15priyanshu/probank-configserver:latest
     restart: always
     container_name: probank-configserver-instance
@@ -106,7 +136,9 @@ services:
 
 
   probank-accounts-service:
-    build: probank-accounts-service/ 
+    build: 
+      context: ./probank-accounts-service
+      dockerfile: Dockerfile 
     image: r15priyanshu/probank-accounts-service:latest
     restart: always
     container_name: probank-accounts-service-instance
@@ -135,7 +167,10 @@ services:
       
     
   probank-loans-service:
-    build: probank-loans-service/ 
+    #If you specify build, then it will try to look for Dockerfile for this service in the context provided.
+    build: 
+      context: ./probank-loans-service
+      dockerfile: Dockerfile
     image: r15priyanshu/probank-loans-service:latest
     restart: always
     container_name: probank-loans-service-instance
@@ -161,7 +196,9 @@ services:
 
 
   probank-cards-service:
-    build: probank-cards-service/
+    build: 
+      context: ./probank-loans-service
+      dockerfile: Dockerfile
     image: r15priyanshu/probank-cards-service:latest
     restart: always
     container_name: probank-cards-service-instance
@@ -186,7 +223,9 @@ services:
         condition: service_healthy
 
   probank-message-service:
-    build: probank-message-service/
+    build: 
+      context: ./probank-message-service
+      dockerfile: Dockerfile
     image: r15priyanshu/probank-message-service:latest
     restart: always
     container_name: probank-message-service-instance
@@ -209,7 +248,9 @@ services:
         condition: service_healthy
 
   probank-apigateway:
-    build: probank-apigateway/
+    build: 
+      context: ./probank-apigateway
+      dockerfile: Dockerfile
     image: r15priyanshu/probank-apigateway:latest
     restart: always
     container_name: probank-apigateway-instance
