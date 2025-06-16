@@ -1,6 +1,7 @@
 package com.probank.cards.controllers;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,10 +67,12 @@ public class CardController {
 
 	@GetMapping("/test")
 	public ResponseEntity<HashMap<String, String>> testEndpoind() {
-		HashMap<String, String> test = new HashMap<>();
-		test.put("APP-ENV", appEnvironment);
-		test.put("APP-NANE", environment.getProperty("spring.application.name"));
-		test.put("APP-JAVA-HOME-PATH", environment.getProperty("JAVA_HOME"));
-		return new ResponseEntity<>(test, HttpStatus.OK);
+		LinkedHashMap<String, String> testHashMap = new LinkedHashMap<>();
+		testHashMap.put("APP-ENV", appEnvironment);
+		testHashMap.put("APP-NAME", environment.getProperty("spring.application.name"));
+		testHashMap.put("APP-MAVEN-HOME", environment.getProperty("MAVEN_HOME"));
+		testHashMap.put("APP-JAVA-HOME", environment.getProperty("JAVA_HOME"));
+		testHashMap.put("APP-JAVA-VERSION", System.getProperty("java.version"));
+		return new ResponseEntity<>(testHashMap, HttpStatus.OK);
 	}
 }
